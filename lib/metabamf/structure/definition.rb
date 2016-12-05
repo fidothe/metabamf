@@ -13,12 +13,16 @@ module Metabamf
     end
 
     class Definition
+      DEFAULT_DESERIALIZER = ->(io, start_offset, attrs) { attrs }
+
       attr_reader :boxtype, :simple_attributes, :contained_single_boxes,
         :contained_multiple_boxes
 
       def initialize(boxtype)
         @boxtype = boxtype
-        @simple_attributes = {}
+        @simple_attributes = {
+          boxtype: {required: true}, size: {required: true}
+        }
         @contained_single_boxes = {}
         @contained_multiple_boxes = {}
 
@@ -42,12 +46,26 @@ module Metabamf
       end
 
       def entity
-        Entity.generate({
+        @entity ||= Entity.generate({
           optional: optional_attrs,
           required: required_attrs,
           multiple_box: multiple_box_attrs,
           query: query_method_attrs
         })
+      end
+
+      def deserializer
+        ->(io, start_offset, boxtype, size) {
+          deserializer = (@deserializer || DEFAULT_DESERIALIZER)
+          attrs = deserializer.call(io, start_offset, {
+            boxtype: boxtype, size: size
+          })
+          entity.new(attrs)
+        }
+      end
+
+      def deserializer=(deserializer_proc)
+        @deserializer = deserializer_proc
       end
 
       private

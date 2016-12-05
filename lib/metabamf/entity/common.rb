@@ -41,6 +41,12 @@ module Metabamf
       def define_methods_and_readers
         klass.send(:attr_reader, *attrs)
 
+        klass.class_eval <<-EOS
+          def attributes
+            {#{attrs.map { |attr| "#{attr}: @#{attr}" }.join(', ')}}
+          end
+        EOS
+
         query.each do |name|
           klass.class_eval <<-EOS
             def #{name}?
@@ -86,6 +92,10 @@ module Metabamf
         attributes.each do |name, value|
           instance_variable_set(:"@#{name}", value)
         end
+      end
+
+      def ==(other)
+        other.attributes == attributes
       end
     end
 

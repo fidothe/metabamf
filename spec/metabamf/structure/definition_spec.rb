@@ -1,4 +1,5 @@
 require 'metabamf/structure/definition'
+require 'stringio'
 
 module Metabamf::Structure
   RSpec.describe Definition do
@@ -94,6 +95,8 @@ module Metabamf::Structure
       let(:other_box) { double }
       let(:entity_class) { definition.entity }
       let(:attrs) { Hash[
+        boxtype: 'fltc',
+        size: 42,
         hello: 'hello',
         what: 'what',
         also: other_box,
@@ -123,6 +126,41 @@ module Metabamf::Structure
         expect {
           entity_class.new(bad_attrs)
         }.to raise_error(Metabamf::Entity::MissingRequiredAttribute)
+      end
+
+      it "compares equal to another instance with the same attrs" do
+        expect(subject).to eq(entity_class.new(attrs))
+      end
+    end
+
+    context "the deserializer" do
+      it "defaults to a no-op lambda" do
+        subject = Definition.new('fltc')
+        io = StringIO.new
+        expected = subject.entity.new(boxtype: 'fltc', size: 100)
+
+        result = subject.deserializer.call(io, 0, 'fltc', 100)
+
+        expect(result).to eq(expected)
+        expect(io.pos).to eq(0)
+      end
+
+      it "allows a proper deserializer to be specified" do
+        subject = Definition.new('fltc') do |d|
+          d.attr :blah, required: true
+          d.deserializer = ->(io, start_offset, attrs) {
+            attrs.merge(blah: io.read(4))
+          }
+        end
+        io = StringIO.new("abcd")
+        expected = subject.entity.new({
+          boxtype: 'fltc', size: 100, blah: 'abcd'
+        })
+
+        result = subject.deserializer.call(io, 0, 'fltc', 100)
+
+        expect(result).to eq(expected)
+        expect(io.pos).to eq(4)
       end
     end
   end
