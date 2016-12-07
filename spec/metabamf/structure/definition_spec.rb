@@ -82,6 +82,24 @@ module Metabamf::Structure
       end
     end
 
+    context "specifying a §4.2 FullBox" do
+      subject = Definition.new('fltc') do |d|
+        d.full_box!
+      end
+
+      it "has a version field" do
+        expect(subject.simple_attributes[:version]).to eq(required: true)
+      end
+
+      it "has a flags field" do
+        expect(subject.simple_attributes[:flags]).to eq(required: true)
+      end
+
+      it "reports its a full box" do
+        expect(subject.full_box?).to be(true)
+      end
+    end
+
     context "generating an entity class" do
       let(:definition) {
         Definition.new('fltc') do |d|

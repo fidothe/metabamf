@@ -45,6 +45,16 @@ module Metabamf
         contained_multiple_boxes[name] = defaults.merge(opts)
       end
 
+      def full_box!
+        @full_box = true
+        attr(:version, required: true)
+        attr(:flags, required: true)
+      end
+
+      def full_box?
+        !!@full_box
+      end
+
       def entity
         @entity ||= Entity.generate({
           optional: optional_attrs,
@@ -57,10 +67,9 @@ module Metabamf
       def deserializer
         ->(io, start_offset, boxtype, size) {
           deserializer = (@deserializer || DEFAULT_DESERIALIZER)
-          attrs = deserializer.call(io, start_offset, {
-            boxtype: boxtype, size: size
-          })
-          entity.new(attrs)
+          attrs = {boxtype: boxtype, size: size}
+          attrs = attrs.merge(read_full_box_fields(io)) if full_box?
+          entity.new(deserializer.call(io, start_offset, attrs))
         }
       end
 
@@ -69,6 +78,12 @@ module Metabamf
       end
 
       private
+
+      def read_full_box_fields(io)
+        version = io.read(1).unpack('C').first
+        flags = io.read(1).unpack('C').first << 16 | io.read(2).unpack('n').first
+        {version: version, flags: flags}
+      end
 
       def gathered(*omit)
         [
