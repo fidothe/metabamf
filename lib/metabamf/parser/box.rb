@@ -51,6 +51,13 @@ module Metabamf
         parser.read(n)
       end
 
+      def read_fixed_point_number(m, f)
+        total_size = m + f
+        meth = {16 => :read_uint16, 32 => :read_uint32}.fetch(total_size)
+        int = send(meth)
+        int / (2**f).to_f
+      end
+
       def pos
         parser.pos
       end

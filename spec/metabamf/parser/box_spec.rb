@@ -62,6 +62,24 @@ module Metabamf::Parser
         subject.read_ascii_bytes(3)
         expect(subject.pos).to eq(3)
       end
+
+      context "reading fixed-point numbers" do
+        subject {
+          Box.new(stream(StringIO.new([0xffffffff].pack('N'))))
+        }
+
+        it "correctly reads a 16.16 number" do
+          expect(subject.read_fixed_point_number(16, 16)).to eq(65535.99998474121)
+        end
+
+        it "correctly reads an 8.8 number" do
+          expect(subject.read_fixed_point_number(8, 8)).to eq(255.99609375)
+        end
+
+        it "correctly reads a 2.30 number" do
+          expect(subject.read_fixed_point_number(2, 30)).to eq(3.9999999990686774)
+        end
+      end
     end
 
     context "a leaf box" do
