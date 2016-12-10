@@ -1,14 +1,16 @@
 require 'metabamf/boxes/ftyp'
+require 'metabamf/parser/stream'
 require 'metabamf/parser/box'
 
 module Metabamf::Boxes
   RSpec.describe Ftyp do
     let(:fixture_dir) { Pathname.new(__dir__).join('../../fixtures/boxes') }
     let(:io) { fixture_dir.join('ftyp.mp4').open('rb') }
-    let(:deserializer_registry) {
-      {'ftyp' => subject.deserializer}
+    let(:definitions) {
+      {'ftyp' => subject}
     }
-    let(:parser) { Metabamf::Parser::Box.new(io, deserializer_registry) }
+    let(:stream) { Metabamf::Parser::Stream.new(io, definitions) }
+    let(:parser) { Metabamf::Parser::Box.new(stream) }
 
     subject { Ftyp }
 

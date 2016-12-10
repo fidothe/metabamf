@@ -1,14 +1,16 @@
 require 'metabamf/boxes/pdin'
+require 'metabamf/parser/stream'
 require 'metabamf/parser/box'
 
 module Metabamf::Boxes
   RSpec.describe Pdin do
     let(:fixture_dir) { Pathname.new(__dir__).join('../../fixtures/boxes') }
     let(:io) { fixture_dir.join('pdin.mp4').open('rb') }
-    let(:deserializer_registry) {
-      {'pdin' => subject.deserializer}
+    let(:definitions) {
+      {'pdin' => subject}
     }
-    let(:parser) { Metabamf::Parser::Box.new(io, deserializer_registry) }
+    let(:stream) { Metabamf::Parser::Stream.new(io, definitions) }
+    let(:parser) { Metabamf::Parser::Box.new(stream) }
 
     subject { Pdin }
 

@@ -7,13 +7,12 @@ module Metabamf
       d.attr :minor_version, required: true
       d.attr :compatible_brands, required: true
 
-      d.deserializer = ->(io, start_offset, attrs) {
-        offset = io.pos
-        header_size = offset - start_offset
-        major_brand = io.read(4)
-        minor_version = io.read(4).unpack("N").first
+      d.deserializer = ->(box, attrs) {
+        header_size = box.pos - box.start_pos
+        major_brand = box.read_ascii_bytes(4)
+        minor_version = box.read_uint32
         remaining_bytes = attrs[:size] - (header_size + 8)
-        compatible_brands = io.read(remaining_bytes).chars.each_slice(4).map(&:join)
+        compatible_brands = box.read_ascii_bytes(remaining_bytes).chars.each_slice(4).map(&:join)
         attrs.merge({
           major_brand: major_brand, minor_version: minor_version,
           compatible_brands: compatible_brands

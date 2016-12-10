@@ -1,14 +1,22 @@
 require 'metabamf/boxes/moov'
+require 'metabamf/parser/stream'
 require 'metabamf/parser/box'
 
 module Metabamf::Boxes
+  NullBox = Metabamf::Structure::Definition.new('null')
+
   RSpec.describe Moov do
     let(:fixture_dir) { Pathname.new(__dir__).join('../../fixtures/boxes') }
     let(:io) { fixture_dir.join('moov.mp4').open('rb') }
-    let(:deserializer_registry) {
-      {'moov' => subject.deserializer}
-    }
-    let(:parser) { Metabamf::Parser::Box.new(io, deserializer_registry) }
+    let(:definitions) { Hash[
+      'moov' => subject,
+      'mvhd' => NullBox,
+      'trak' => NullBox,
+      'mvex' => NullBox,
+      'udta' => NullBox
+    ] }
+    let(:stream) { Metabamf::Parser::Stream.new(io, definitions) }
+    let(:parser) { Metabamf::Parser::Box.new(stream) }
 
     subject { Moov }
 
@@ -31,20 +39,20 @@ module Metabamf::Boxes
         expect(entity.mvhd.boxtype).to eq('mvhd')
       end
 
-      it "has a meta child" do
+      xit "may have a meta child" do
         expect(entity.meta.boxtype).to eq('meta')
       end
 
       it "has trak children" do
-        expect(entity.trak.first.boxtype).to eq('trak')
+        expect(entity.traks.first.boxtype).to eq('trak')
       end
 
-      it "may have an mvex child" do
+      xit "may have an mvex child" do
         expect(entity.mvex.boxtype).to eq('mvex')
       end
 
       it "may have a udta child" do
-        expect(entity.mvex.boxtype).to eq('mvex')
+        expect(entity.udta.boxtype).to eq('udta')
       end
     end
   end

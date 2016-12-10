@@ -152,33 +152,34 @@ module Metabamf::Structure
     end
 
     context "the deserializer" do
+      let(:box) {
+        instance_double('Metabamf::Parser::Box', {
+          boxtype: 'fltc', size: 100
+        })
+      }
       it "defaults to a no-op lambda" do
         subject = Definition.new('fltc')
-        io = StringIO.new
         expected = subject.entity.new(boxtype: 'fltc', size: 100)
 
-        result = subject.deserializer.call(io, 0, 'fltc', 100)
+        result = subject.deserializer.call(box)
 
         expect(result).to eq(expected)
-        expect(io.pos).to eq(0)
       end
 
       it "allows a proper deserializer to be specified" do
         subject = Definition.new('fltc') do |d|
           d.attr :blah, required: true
-          d.deserializer = ->(io, start_offset, attrs) {
-            attrs.merge(blah: io.read(4))
+          d.deserializer = ->(box, attrs) {
+            attrs.merge(blah: 'blah')
           }
         end
-        io = StringIO.new("abcd")
         expected = subject.entity.new({
-          boxtype: 'fltc', size: 100, blah: 'abcd'
+          boxtype: 'fltc', size: 100, blah: 'blah'
         })
 
-        result = subject.deserializer.call(io, 0, 'fltc', 100)
+        result = subject.deserializer.call(box)
 
         expect(result).to eq(expected)
-        expect(io.pos).to eq(4)
       end
     end
   end

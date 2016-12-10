@@ -8,16 +8,13 @@ module Metabamf
       d.contains :mvex
       d.contains :udta
 
-      d.deserializer = ->(io, start_offset, attrs, parser) {
-        offset = io.pos
-        size = attrs[:size]
-        end_offset = start_offset + size
-        children = parser.parse_children(io, offset, end_offset)
-        traks = children.select { |k, v| k == 'trak' }.map { |k, v| v }
+      d.deserializer = ->(box, attrs) {
+        children = box.parse_children
+        traks = children.fetch_group('trak')
         attrs.merge({
-          mvhd: children['mvhd'], traks: traks, mvex: children['mvex'],
-          udta: children['udta']
-        }.compact)
+          mvhd: children.fetch('mvhd'), traks: traks, mvex: children.fetch('mvex'),
+          udta: children.fetch('udta')
+        }.reject { |k,v| v.nil? })
       }
     end
   end

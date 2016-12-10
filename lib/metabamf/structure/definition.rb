@@ -13,7 +13,7 @@ module Metabamf
     end
 
     class Definition
-      DEFAULT_DESERIALIZER = ->(io, start_offset, attrs) { attrs }
+      DEFAULT_DESERIALIZER = ->(box, attrs) { attrs }
 
       attr_reader :boxtype, :simple_attributes, :contained_single_boxes,
         :contained_multiple_boxes
@@ -65,11 +65,11 @@ module Metabamf
       end
 
       def deserializer
-        ->(io, start_offset, boxtype, size) {
+        ->(box) {
           deserializer = (@deserializer || DEFAULT_DESERIALIZER)
-          attrs = {boxtype: boxtype, size: size}
-          attrs = attrs.merge(read_full_box_fields(io)) if full_box?
-          entity.new(deserializer.call(io, start_offset, attrs))
+          attrs = {boxtype: box.boxtype, size: box.size}
+          attrs = attrs.merge(read_full_box_fields(box)) if full_box?
+          entity.new(deserializer.call(box, attrs))
         }
       end
 
@@ -79,9 +79,9 @@ module Metabamf
 
       private
 
-      def read_full_box_fields(io)
-        version = io.read(1).unpack('C').first
-        flags = io.read(1).unpack('C').first << 16 | io.read(2).unpack('n').first
+      def read_full_box_fields(box)
+        version = box.read_uint8
+        flags = box.read_uint8 << 16 | box.read_uint16
         {version: version, flags: flags}
       end
 

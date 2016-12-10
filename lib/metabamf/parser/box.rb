@@ -1,12 +1,11 @@
 module Metabamf
   module Parser
     class Box
-      attr_reader :io, :deserializer_registry, :start_offset
+      attr_reader :parser, :start_pos
 
-      def initialize(io, deserializer_registry)
-        @io = io
-        @deserializer_registry = deserializer_registry
-        @start_offset = io.pos
+      def initialize(parser)
+        @parser = parser
+        @start_pos = parser.pos
       end
 
       def size
@@ -23,13 +22,42 @@ module Metabamf
 
       def deserialize
         return @result if @result
-        @result = deserializer.call(io, start_offset, boxtype, size)
+        @result = deserializer.call(self)
         ensure_io_at_end_of_box
         @result
       end
 
       def deserializer
-        deserializer_registry[boxtype]
+        parser.deserializer(boxtype)
+      end
+
+      def read_uint8
+        parser.read(1).unpack("C").first
+      end
+
+      def read_uint16
+        parser.read(2).unpack("n").first
+      end
+
+      def read_uint32
+        parser.read(4).unpack("N").first
+      end
+
+      def read_uint64
+        parser.read(8).unpack("Q>").first
+      end
+
+      def read_ascii_bytes(n)
+        parser.read(n)
+      end
+
+      def pos
+        parser.pos
+      end
+
+      def parse_children
+        final_pos = start_pos + size
+        children = parser.parse_boxes_until(final_pos)
       end
 
       private
@@ -37,23 +65,23 @@ module Metabamf
       # see ISO 14496-12:2015 §4.2
       def read_size_and_boxtype
         @size = read_compact_size
-        @boxtype = io.read(4)
+        @boxtype = read_ascii_bytes(4)
         @size = read_extended_size if @size == 1
       end
 
       def read_compact_size
-        io.read(4).unpack("N").first
+        read_uint32
       end
 
       def read_extended_size
-        io.read(8).unpack("Q").first
+        read_uint64
       end
 
       def ensure_io_at_end_of_box
         if size == 0 # last box magic number, seek to EOF
-          io.seek(0, IO::SEEK_END)
+          parser.seek_to_end
         else
-          io.seek(start_offset + size, IO::SEEK_SET)
+          parser.seek_to(start_pos + size)
         end
       end
     end
