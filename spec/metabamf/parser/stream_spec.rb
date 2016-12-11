@@ -73,11 +73,27 @@ module Metabamf::Parser
         expect(entity.boxtype).to eq('fltc')
       end
 
-      it "can parse a sequence of boxes" do
+      it "can parse a bounded sequence of boxes" do
         entity_set = subject.parse_boxes_until(23)
-        expect(entity_set.to_a.size).to eq(2)
-        expect(entity_set.to_a.first.blah).to eq('blah')
-        expect(entity_set.to_a.last.meh).to eq('meh')
+        expect(entity_set.size).to eq(2)
+        expect(entity_set.first.blah).to eq('blah')
+        expect(entity_set.last.meh).to eq('meh')
+      end
+
+      it "can parse an unbounded sequence of boxes" do
+        entity_set = subject.parse_boxes
+        expect(entity_set.size).to eq(3)
+        expect(entity_set[0].blah).to eq('blah')
+        expect(entity_set[1].meh).to eq('meh')
+        expect(entity_set[2].meh).to eq('meh')
+      end
+
+      context "parsing a complete file" do
+        it "takes an IO and definitions and returns a Metabamf::File" do
+          file = subject.parse_stream!
+          expect(file).not_to have_pdin
+          expect(file.each.map { |en| en.boxtype }).to eq(['fltc', 'aflc', 'aflc'])
+        end
       end
     end
   end

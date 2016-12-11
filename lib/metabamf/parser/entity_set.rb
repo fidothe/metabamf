@@ -1,6 +1,13 @@
+require 'forwardable'
+
 module Metabamf
   module Parser
     class EntitySet
+      extend Forwardable
+      include Enumerable
+
+      def_delegators :@entities, :[], :size, :length, :each, :last
+
       def initialize
         @entities = []
       end
@@ -8,10 +15,6 @@ module Metabamf
       def <<(entity)
         @entities << entity
         self
-      end
-
-      def to_a
-        @entities
       end
 
       def fetch(boxtype)

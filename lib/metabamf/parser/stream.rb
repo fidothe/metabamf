@@ -1,5 +1,6 @@
 require 'metabamf/parser/box'
 require 'metabamf/parser/entity_set'
+require 'metabamf/file'
 
 module Metabamf
   module Parser
@@ -30,6 +31,18 @@ module Metabamf
           entity_set << parse_next_box
         end
         entity_set
+      end
+
+      def parse_boxes
+        entity_set = EntitySet.new
+        while !io.eof?
+          entity_set << parse_next_box
+        end
+        entity_set
+      end
+
+      def parse_stream!
+        Metabamf::File.new(parse_boxes)
       end
 
       def read(*args)
