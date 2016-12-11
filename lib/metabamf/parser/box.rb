@@ -9,19 +9,19 @@ module Metabamf
       end
 
       def size
-        return @size if @size
+        return @size if instance_variable_defined?(:@size)
         read_size_and_boxtype
         @size
       end
 
       def boxtype
-        return @boxtype if @boxtype
+        return @boxtype if instance_variable_defined?(:@boxtype)
         read_size_and_boxtype
         @boxtype
       end
 
       def deserialize
-        return @result if @result
+        return @result if instance_variable_defined?(:@result)
         @result = deserializer.call(self)
         ensure_io_at_end_of_box
         @result

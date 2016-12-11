@@ -19,6 +19,7 @@ module Metabamf
         :contained_multiple_boxes
 
       def initialize(boxtype)
+        @full_box = false
         @boxtype = boxtype
         @simple_attributes = {
           boxtype: {required: true}, size: {required: true}
@@ -52,7 +53,7 @@ module Metabamf
       end
 
       def full_box?
-        !!@full_box
+        @full_box
       end
 
       def entity
