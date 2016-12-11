@@ -94,6 +94,12 @@ module Metabamf::Parser
           expect(file).not_to have_pdin
           expect(file.each.map { |en| en.boxtype }).to eq(['fltc', 'aflc', 'aflc'])
         end
+
+        it "offers a convenience class method that takes io and definitinos" do
+          file = Stream.parse_stream!(io, definitions)
+          expect(file).not_to have_pdin
+          expect(file.each.map { |en| en.boxtype }).to eq(['fltc', 'aflc', 'aflc'])
+        end
       end
     end
   end

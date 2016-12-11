@@ -7,6 +7,10 @@ module Metabamf
     class Stream
       attr_reader :io, :definitions, :start_offset
 
+      def self.parse_stream!(io, definitions)
+        new(io, definitions).parse_stream!
+      end
+
       def initialize(io, definitions)
         @io = io
         @definitions = definitions
