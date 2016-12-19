@@ -101,5 +101,14 @@ module Metabamf::Parser
         expect(io.pos).to eq(12)
       end
     end
+
+    context "an unknown box" do
+      let(:io) { fixture_dir.join('unknown_box.mp4').open('rb') }
+
+      it "returns a NullBox with the appropriate box_type and size" do
+        actual = subject.deserialize
+        expect(actual).to eq(Metabamf::NullBox.new(boxtype: 'unkn', size: 42))
+      end
+    end
   end
 end

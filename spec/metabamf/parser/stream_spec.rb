@@ -1,7 +1,6 @@
 require 'stringio'
 require 'metabamf/structure/definition'
 require 'metabamf/parser/stream'
-require 'metabamf/parser/box'
 
 module Metabamf::Parser
   RSpec.describe Stream do
@@ -18,6 +17,10 @@ module Metabamf::Parser
 
     it "can look up a definition instance" do
       expect(subject.definition('ftyp')).to be(definition)
+    end
+
+    it "returns NullBox if there's no definition for a boxtype" do
+      expect(subject.definition('unkn')).to be(Metabamf::NullBox)
     end
 
     it "can return a deserializer from a definition" do

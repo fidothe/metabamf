@@ -1,6 +1,7 @@
 require 'metabamf/parser/box'
 require 'metabamf/parser/entity_set'
 require 'metabamf/file'
+require 'metabamf/null_box'
 
 module Metabamf
   module Parser
@@ -18,7 +19,7 @@ module Metabamf
       end
 
       def definition(boxtype)
-        definitions[boxtype]
+        definitions.fetch(boxtype, NullBox)
       end
 
       def deserializer(boxtype)
