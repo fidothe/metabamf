@@ -3,17 +3,11 @@ require 'metabamf/parser/stream'
 require 'metabamf/parser/box'
 
 module Metabamf::Boxes
-  NullBox = Metabamf::Structure::Definition.new('null')
-
   RSpec.describe Moov do
     let(:fixture_dir) { Pathname.new(__dir__).join('../../fixtures/boxes') }
     let(:io) { fixture_dir.join('moov.mp4').open('rb') }
     let(:definitions) { Hash[
-      'moov' => subject,
-      'mvhd' => NullBox,
-      'trak' => NullBox,
-      'mvex' => NullBox,
-      'udta' => NullBox
+      'moov' => subject
     ] }
     let(:stream) { Metabamf::Parser::Stream.new(io, definitions) }
     let(:parser) { Metabamf::Parser::Box.new(stream) }
