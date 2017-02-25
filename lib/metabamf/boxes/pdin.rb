@@ -1,8 +1,8 @@
-require 'metabamf/structure/definition'
+require 'metabamf/box_definition'
 
 module Metabamf
   module Boxes
-    Pdin = Structure::Definition.new('pdin') do |d|
+    Pdin = BoxDefinition.new('pdin') do |d|
       d.full_box!
       d.attr :rate_and_delay_pairs, required: true
 

@@ -1,8 +1,8 @@
-require 'metabamf/structure/definition'
+require 'metabamf/box_definition'
 
 module Metabamf
   module Boxes
-    Meta = Structure::Definition.new('meta') do |d|
+    Meta = BoxDefinition.new('meta') do |d|
       d.full_box!
       d.contains :hdlr, required: true
       d.contains :dinf

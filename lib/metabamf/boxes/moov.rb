@@ -1,8 +1,8 @@
-require 'metabamf/structure/definition'
+require 'metabamf/box_definition'
 
 module Metabamf
   module Boxes
-    Moov = Structure::Definition.new('moov') do |d|
+    Moov = BoxDefinition.new('moov') do |d|
       d.contains :mvhd, required: true
       d.contains_multiple :traks, boxtype: 'trak'
       d.contains :mvex

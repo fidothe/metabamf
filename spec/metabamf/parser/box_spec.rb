@@ -1,6 +1,6 @@
 require 'pathname'
 require 'metabamf/parser/stream'
-require 'metabamf/structure/definition'
+require 'metabamf/box_definition'
 require 'metabamf/parser/box'
 
 module Metabamf::Parser
@@ -8,7 +8,7 @@ module Metabamf::Parser
     let(:fixture_dir) { Pathname.new(__dir__).join('../../fixtures') }
     let(:io) { fixture_dir.join('box.mp4').open('rb') }
     let(:definition) {
-      Metabamf::Structure::Definition.new('fltc') do |d|
+      Metabamf::BoxDefinition.new('fltc') do |d|
         d.attr :field, required: true
 
         d.deserializer = ->(box, attrs) {

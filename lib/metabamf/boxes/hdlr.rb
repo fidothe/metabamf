@@ -1,8 +1,8 @@
-require 'metabamf/structure/definition'
+require 'metabamf/box_definition'
 
 module Metabamf
   module Boxes
-    Hdlr = Structure::Definition.new('hdlr') do |d|
+    Hdlr = BoxDefinition.new('hdlr') do |d|
       d.full_box!
       d.attr :handler_type, required: true
       d.attr :name, required: true

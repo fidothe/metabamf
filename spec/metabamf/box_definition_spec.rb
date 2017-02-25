@@ -1,16 +1,16 @@
-require 'metabamf/structure/definition'
+require 'metabamf/box_definition'
 require 'stringio'
 
-module Metabamf::Structure
-  RSpec.describe Definition do
+module Metabamf
+  RSpec.describe BoxDefinition do
     it "has a boxtype" do
-      subject = Definition.new('moov')
+      subject = BoxDefinition.new('moov')
 
       expect(subject.boxtype).to eq('moov')
     end
 
     it "can specify a mandatory simple attribute" do
-      subject = Definition.new('fltc') do |d|
+      subject = BoxDefinition.new('fltc') do |d|
         d.attr :blah, required: true
       end
 
@@ -18,7 +18,7 @@ module Metabamf::Structure
     end
 
     it "can specify an optional simple attribute" do
-      subject = Definition.new('fltc') do |d|
+      subject = BoxDefinition.new('fltc') do |d|
         d.attr :blah
       end
 
@@ -27,7 +27,7 @@ module Metabamf::Structure
 
     context "a child box which can only occur once" do
       it "can be specified as mandatory" do
-        subject = Definition.new('fltc') do |d|
+        subject = BoxDefinition.new('fltc') do |d|
           d.contains :blah, required: true
         end
 
@@ -36,7 +36,7 @@ module Metabamf::Structure
       end
 
       it "can be specifed as optional" do
-        subject = Definition.new('fltc') do |d|
+        subject = BoxDefinition.new('fltc') do |d|
           d.contains :blah
         end
 
@@ -45,7 +45,7 @@ module Metabamf::Structure
       end
 
       it "can have the boxtype explicitly specified" do
-        subject = Definition.new('fltc') do |d|
+        subject = BoxDefinition.new('fltc') do |d|
           d.contains :blah, boxtype: 'oflc'
         end
 
@@ -56,7 +56,7 @@ module Metabamf::Structure
 
     context "child boxes which can occur multiple times" do
       it "can be specified as mandatory" do
-        subject = Definition.new('fltc') do |d|
+        subject = BoxDefinition.new('fltc') do |d|
           d.contains_multiple :blah, boxtype: 'oflc', required: true
         end
 
@@ -65,7 +65,7 @@ module Metabamf::Structure
       end
 
       it "can be specifed as optional" do
-        subject = Definition.new('fltc') do |d|
+        subject = BoxDefinition.new('fltc') do |d|
           d.contains_multiple :blah, boxtype: 'oflc'
         end
 
@@ -75,7 +75,7 @@ module Metabamf::Structure
 
       it "must have the boxtype explicitly specified" do
         expect {
-          Definition.new('fltc') do |d|
+          BoxDefinition.new('fltc') do |d|
             d.contains_multiple :blah
           end
         }.to raise_error(ExplicitBoxtypeRequired)
@@ -83,7 +83,7 @@ module Metabamf::Structure
     end
 
     context "specifying a §4.2 FullBox" do
-      subject = Definition.new('fltc') do |d|
+      subject = BoxDefinition.new('fltc') do |d|
         d.full_box!
       end
 
@@ -102,7 +102,7 @@ module Metabamf::Structure
 
     context "generating an entity class" do
       let(:definition) {
-        Definition.new('fltc') do |d|
+        BoxDefinition.new('fltc') do |d|
           d.attr :hello, required: true
           d.attr :what
           d.contains :blah
@@ -158,7 +158,7 @@ module Metabamf::Structure
         })
       }
       it "defaults to a no-op lambda" do
-        subject = Definition.new('fltc')
+        subject = BoxDefinition.new('fltc')
         expected = subject.entity.new(boxtype: 'fltc', size: 100)
 
         result = subject.deserializer.call(box)
@@ -167,7 +167,7 @@ module Metabamf::Structure
       end
 
       it "allows a proper deserializer to be specified" do
-        subject = Definition.new('fltc') do |d|
+        subject = BoxDefinition.new('fltc') do |d|
           d.attr :blah, required: true
           d.deserializer = ->(box, attrs) {
             attrs.merge(blah: 'blah')

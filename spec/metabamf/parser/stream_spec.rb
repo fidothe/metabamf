@@ -1,12 +1,12 @@
 require 'stringio'
-require 'metabamf/structure/definition'
+require 'metabamf/box_definition'
 require 'metabamf/parser/stream'
 
 module Metabamf::Parser
   RSpec.describe Stream do
     let(:deserializer) { double }
     let(:definition) {
-      instance_double(Metabamf::Structure::Definition, {
+      instance_double(Metabamf::BoxDefinition, {
         deserializer: deserializer
       })
     }
@@ -57,13 +57,13 @@ module Metabamf::Parser
       let(:fixture_dir) { Pathname.new(__dir__).join('../../fixtures') }
       let(:io) { fixture_dir.join('sequence.mp4').open('rb') }
       let(:definitions) { Hash[
-        'fltc' => Metabamf::Structure::Definition.new('fltc') do |d|
+        'fltc' => Metabamf::BoxDefinition.new('fltc') do |d|
           d.attr :blah, required: true
           d.deserializer = ->(box, attrs) {
             attrs.merge({blah: box.read_ascii_bytes(4)})
           }
         end,
-        'aflc' => Metabamf::Structure::Definition.new('aflc') do |d|
+        'aflc' => Metabamf::BoxDefinition.new('aflc') do |d|
           d.attr :meh, required: true
           d.deserializer = ->(box, attrs) {
             attrs.merge({meh: box.read_ascii_bytes(3)})

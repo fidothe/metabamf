@@ -1,8 +1,8 @@
-require 'metabamf/structure/definition'
+require 'metabamf/box_definition'
 
 module Metabamf
   module Boxes
-    Ftyp = Structure::Definition.new('ftyp') do |d|
+    Ftyp = BoxDefinition.new('ftyp') do |d|
       d.attr :major_brand, required: true
       d.attr :minor_version, required: true
       d.attr :compatible_brands, required: true

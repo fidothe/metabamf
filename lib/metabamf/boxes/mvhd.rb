@@ -1,11 +1,11 @@
-require 'metabamf/structure/definition'
+require 'metabamf/box_definition'
 require 'matrix'
 
 module Metabamf
   module Boxes
     EPOCH_TIME = Time.utc(1904, 1, 1)
 
-    Mvhd = Structure::Definition.new('mvhd') do |d|
+    Mvhd = BoxDefinition.new('mvhd') do |d|
       d.full_box!
       d.attr :creation_time, required: true
       d.attr :modification_time, required: true
